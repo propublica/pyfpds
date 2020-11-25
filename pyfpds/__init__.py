@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-__author__ = 'Kaitlin Devine'
-__email__ = 'katycorp@gmail.com'
-__version__ = '0.1.0'
+__author__ = 'Kaitlin Devine, Derek Willis'
+__email__ = 'derek.willis@propublica.org'
+__version__ = '0.2.0'
 
 from collections import OrderedDict
 import xmltodict
@@ -13,14 +13,12 @@ import warnings
 warnings.filterwarnings('ignore')
 
 field_map = {
-    
     'piid': 'PIID',
     'idv_piid': 'REF_IDV_PIID',
     'idv_agency_id': 'REF_IDV_AGENCY_ID',
     'modification_number': 'MODIFICATION_NUMBER',
-    
     'contracting_agency_id': 'CONTRACTING_AGENCY_ID',
-    'contracting_agency_name': 'CONTRACTING_AGENCY_NAME', 
+    'contracting_agency_name': 'CONTRACTING_AGENCY_NAME',
     'contracting_office_id': 'CONTRACTING_OFFICE_ID',
     'contracting_office_name': 'CONTRACTING_OFFICE_NAME',
     'funding_agency_id': 'FUNDING_AGENCY_ID',
@@ -30,7 +28,6 @@ field_map = {
     'agency_name': 'AGENCY_NAME',
     'department_id': 'DEPARTMENT_ID',
     'department_name': 'DEPARTMENT_NAME',
-
     'last_modified_date': 'LAST_MOD_DATE',
     'last_modified_by': 'LAST_MODIFIED_BY',
     'award_completion_date': 'AWARD_COMPLETION_DATE',
@@ -38,11 +35,9 @@ field_map = {
     'date_signed': 'SIGNED_DATE',
     'effective_date': 'EFFECTIVE_DATE',
     'estimated_completion_date': 'ESTIMATED_COMPLETION_DATE',
-    
     'obligated_amount': 'OBLIGATED_AMOUNT',
     'ultimate_contract_value': 'ULTIMATE_CONTRACT_VALUE',
     'contract_pricing_type': 'TYPE_OF_CONTRACT_PRICING',
-    
     'award_status': 'AWARD_STATUS',
     'contract_type': 'CONTRACT_TYPE',
     'created_by': 'CREATED_BY',
@@ -54,16 +49,13 @@ field_map = {
     'multiyear_contract': 'MULTIYEAR_CONTRACT',
     'national_interest_code': 'NATIONAL_INTEREST_CODE',
     'national_interest_description': 'NATIONAL_INTEREST_DESCRIPTION',
-    
     'naics_code': 'PRINCIPAL_NAICS_CODE',
     'naics_description': 'NAICS_DESCRIPTION',
     'product_or_service_code': 'PRODUCT_OR_SERVICE_CODE',
     'product_or_service_description': 'PRODUCT_OR_SERVICE_DESCRIPTION',
-    
     'place_of_performance_district': 'POP_CONGRESS_DISTRICT_CODE',
     'place_of_performance_country': 'POP_CONGRESS_COUNTRY',
     'place_of_performance_state': 'POP_STATE_NAME',
-
     'vendor_city': 'VENDOR_ADDRESS_CITY',
     'vendor_district': 'VENDOR_CONGRESS_DISTRICT_CODE',
     'vendor_country_code': 'VENDOR_ADDRESS_COUNTRY_CODE',
@@ -73,8 +65,7 @@ field_map = {
     'vendor_name': 'VENDOR_NAME',
     'vendor_state_code': 'VENDOR_ADDRESS_STATE_CODE',
     'vendor_state_name': 'VENDOR_ADDRESS_STATE_NAME',
-    'vendor_zip': 'VENDOR_ADDRESS_ZIP_CODE',
-
+    'vendor_zip': 'VENDOR_ADDRESS_ZIP_CODE'
 }
 
 boolean_map = {
@@ -84,21 +75,20 @@ boolean_map = {
 
 
 class Contracts():
-    
-    feed_url = "https://www.fpds.gov/ezsearch/FEEDS/ATOM?FEEDNAME=PUBLIC&q="
+
+    feed_url = "https://www.fpds.gov/ezsearch/FEEDS/ATOM?FEEDNAME=PUBLIC&s=FPDS.GOV&templateName=1.5.1&indexName=awardfull&x=0&y=0&sortBy=SIGNED_DATE&desc=Y&q="
     feed_size = 10
     query_url = ''
-   
+
     def __init__(self, logger=None):
         #point logger to a log function, print by default
         if logger:
-            self.log = logger 
+            self.log = logger
         else:
             self.log = print
 
     def pretty_print(self, data):
         self.log(json.dumps(data, indent=4))
-
 
     def convert_params(self, params):
 
@@ -108,7 +98,7 @@ class Contracts():
         return new_params
 
     def combine_params(self, params):
-        return " ".join("%s:%s" % (k,v) for k,v in params.items())
+        return "&".join("%s:%s" % (k,v) for k,v in params.items())
 
     def process_data(self, data):
         #todo
@@ -117,7 +107,7 @@ class Contracts():
             data = [data,]
         return data
 
-    def get(self, num_records=100, order='desc', **kwargs):
+    def get(self, num_records=100, **kwargs):
 
         params = self.combine_params(self.convert_params(kwargs))
 
@@ -125,7 +115,7 @@ class Contracts():
         i = 0
         #for n in range(0, num_records, 10):
         while num_records == "all" or i < num_records:
-            
+
             self.log("querying {0}{1}&start={2}".format(self.feed_url, params, i))
             resp = requests.get(self.feed_url + params + '&start={0}'.format(i), timeout=60, verify = False)
             self.query_url = resp.url
@@ -136,22 +126,14 @@ class Contracts():
                 for pd in processed_data:
                     data.append(pd)
                     i += 1
-                
+
                 #if data contains less than 10 records, break out of loop
                 if  len(processed_data) < 10:
                     break
-            
+
             except KeyError as e:
                 #no results
                 self.log("No results for query")
                 break
 
         return data
-
-
-
-
-
-
-
-
