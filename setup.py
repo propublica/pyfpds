@@ -22,12 +22,12 @@ test_requirements = [
 
 setup(
     name='pyfpds',
-    version='0.1.0',
+    version='0.2.0',
     description='pyfpds is a python wrapper for accessing federal contracting data in the Federal Procurement Data System (FPDS)',
     long_description=readme,
-    author='Kaitlin Devine',
-    author_email='kaitlin.devine@gsa.gov',
-    url='https://github.com/kaitlin/pyfpds',
+    author='Kaitlin Devine, Derek Willis',
+    author_email='derek.willis@propublica.org',
+    url='https://github.com/propublica/pyfpds',
     packages=[
         'pyfpds',
     ],
